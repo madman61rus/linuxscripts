@@ -44,9 +44,13 @@ if __name__ == '__main__':
 	listOfDirs = []
 
 	for dirName in os.walk(unicode(parameters['where'],'utf-8')):
-		listOfDirs.append(dirName)
+		listOfDirs.append({ 'path': dirName[0],'files': dirName[2] })
 
-	print listOfDirs[1:]
+	for path in listOfDirs[1:]:
+		if parameters['name'][0] in path['files']:
+			print path['path']
+		else:
+			print unicode(str(parameters['name']),'utf-8')
 
 	
 

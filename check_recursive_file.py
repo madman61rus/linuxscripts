@@ -21,16 +21,14 @@ def createParser ():
 def setParameters (allContent,size,time,name,where):
 
 	return {
-	'allContent': allContent,
+	'allContent': "".join(allContent),
 	'size': size,
 	'time': int(time),
-	'name': name,
+	'name': "".join(name),
 	'where': where,
 	'counter': 0,
-	'counterPaths': 0,
-	'pathes': [],
-	'pathesWithout': [],
-	'dateTimeOfFile': datetime.datetime(2015,01,01,0,0),
+	'allCounter': 0,
+	'lastTimeOfFile': datetime.datetime(2015,01,01,0,0),
 	 }
 
 
@@ -51,31 +49,39 @@ if __name__ == '__main__':
 		)
 
 	listOfDirs = []
+	listWithout = []
 
 	for dirName in os.walk(unicode(parameters['where'],'utf-8')):
-		listOfDirs.append({ 'path': dirName[0],'files': dirName[2] })
+		
+		parameters['allCounter'] += 1
 
-	for path in listOfDirs[1:]:
+		if parameters['name'] in dirName[2]:
 
-		parameters['counterPaths'] += 1
-
-		if ''.join(parameters['name']) in path['files']:
+			file = {
+				'pathToFile': dirName[0],
+				'filesInPath': dirName[2],
+				'timeOfFile': datetime.datetime.fromtimestamp(os.path.getmtime(dirName[0] + "/" + parameters['name'])),
+				'sizeOfFile': os.path.getsize(dirName[0] + "/" + parameters['name']),
+			}
 			parameters['counter'] += 1
-			parameters['pathes'].append(path['path'])
-			lastModifiedDate = datetime.datetime.fromtimestamp(os.path.getmtime(path['path'] + "/" + ''.join(parameters['name'])))
-			if parameters['dateTimeOfFile'] < lastModifiedDate :
-				parameters['dateTimeOfFile'] = lastModifiedDate
+			listOfDirs.append(file)
+
+			if parameters['lastTimeOfFile'] < file['timeOfFile'] :
+				parameters['lastTimeOfFile'] = file['timeOfFile']
 		else:
-			parameters['pathesWithout'].append(path['path'])
 
-	if parameters['allContent'] and not (parameters['counterPaths'] == parameters['counter']):
-		print 'WARNING !!! In ' + "and".join(parameters['pathesWithout']) + " file is not exist"
-		sys.exit(1)
+			listWithout.append(dirName[0])
 	
+	print parameters	
+	
+	if (parameters['allContent'] == 'True') and not (parameters['allCounter'] == parameters['counter']):
+		print 'WARNING !!! In ' + "and".join(listWithout) + " file is not exist"
+		sys.exit(1)
 
-	if (((datetime.datetime.now() - parameters['dateTimeOfFile']).days) > parameters['time'] ):
-			print "ALERT ! The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['dateTimeOfFile']).days)
+
+	if (((datetime.datetime.now() - parameters['lastTimeOfFile']).days) > parameters['time'] ):
+			print "ALERT ! The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['lastTimeOfFile']).days)
 			sys.exit(2)
 	else:
-			print "OK. The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['dateTimeOfFile']).days)
+			print "OK. The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['lastTimeOfFile']).days)
 			sys.exit(0)

@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
 		if ''.join(parameters['name']) in path['files']:
 			parameters['counter'] += 1
-			parameters['pathes'].append(path['path'])
+			parameters['pathes'].append([path['path'],os.path.getsize(path['path'] + "/" + ''.join(parameters['name']))])
 			lastModifiedDate = datetime.datetime.fromtimestamp(os.path.getmtime(path['path'] + "/" + ''.join(parameters['name'])))
 			if parameters['dateTimeOfFile'] < lastModifiedDate :
 				parameters['dateTimeOfFile'] = lastModifiedDate
@@ -72,6 +72,7 @@ if __name__ == '__main__':
 		print 'WARNING !!! In ' + "and".join(parameters['pathesWithout']) + " file is not exist"
 		sys.exit(1)
 	
+	print parameters['pathes']
 
 	if (((datetime.datetime.now() - parameters['dateTimeOfFile']).days) > parameters['time'] ):
 			print "ALERT ! The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['dateTimeOfFile']).days)

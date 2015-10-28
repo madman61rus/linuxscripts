@@ -15,12 +15,13 @@ def createParser ():
 	parser.add_argument('-w','--where', nargs = '+' , required =True , help = 'Path to a file to check')			# Directory where shell we look for the file 
 	parser.add_argument('-a', '--allContent',required = False, help = 'All directory should contain a file')
 
+	
 	return (parser)
 
 def setParameters (allContent,size,time,name,where):
 
 	return {
-	'all-content': allContent,
+	'allContent': allContent,
 	'size': size,
 	'time': int(time),
 	'name': name,
@@ -28,8 +29,10 @@ def setParameters (allContent,size,time,name,where):
 	'counter': 0,
 	'counterPaths': 0,
 	'pathes': [],
+	'pathesWithout': [],
 	'dateTimeOfFile': datetime.datetime(2015,01,01,0,0),
 	 }
+
 
 #
 # Main
@@ -62,10 +65,17 @@ if __name__ == '__main__':
 			lastModifiedDate = datetime.datetime.fromtimestamp(os.path.getmtime(path['path'] + "/" + ''.join(parameters['name'])))
 			if parameters['dateTimeOfFile'] < lastModifiedDate :
 				parameters['dateTimeOfFile'] = lastModifiedDate
+		else:
+			parameters['pathesWithout'].append(path['path'])
+
+	if parameters['allContent'] and not (parameters['counterPaths'] == parameters['counter']):
+		print 'WARNING !!! In ' + "and".join(parameters['pathesWithout']) + " file is not exist"
+		sys.exit(1)
 	
 
 	if (((datetime.datetime.now() - parameters['dateTimeOfFile']).days) > parameters['time'] ):
-			print "Oooooops  %i" % (datetime.datetime.now() - parameters['dateTimeOfFile']).days
+			print "ALERT ! The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['dateTimeOfFile']).days)
+			sys.exit(2)
 	else:
-			print "It's OK %i" % (datetime.datetime.now() - parameters['dateTimeOfFile']).days
-
+			print "OK. The last file %s was written %i day(s) ago." % ("".join(parameters['name']),(datetime.datetime.now() - parameters['dateTimeOfFile']).days)
+			sys.exit(0)

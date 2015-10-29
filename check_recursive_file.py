@@ -52,10 +52,12 @@ if __name__ == '__main__':
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
 
-    if (namespace.size[-1:]) == 'M' or (namespace.size[-1:]) == 'm':
+    if (namespace.size[-1:]) == 'K' or (namespace.size[-1:]) == 'k':
         size = int(namespace.size[:-1]) * 1024
-    elif (namespace.size[-1:]) == 'G' or (namespace.size[-1:]) == 'g':
+    elif (namespace.size[-1:]) == 'M' or (namespace.size[-1:]) == 'm':
         size = int(namespace.size[:-1]) * 1024 * 1024
+    elif (namespace.size[-1:]) == 'G' or (namespace.size[-1:]) == 'g':
+        size = int(namespace.size[:-1]) * 1024 * 1024 * 1024
     else:
         size = namespace.size
 
@@ -107,7 +109,7 @@ if __name__ == '__main__':
 
     if (parameters['allContent'] == 'True') and \
             (len(listWithout) > 0):
-        print 'WARNING !!! In '+" and ".join(listWithout)+" file is not exist"
+        print 'WARNING !!! In '+" and ".join(listWithout)+" file is missing"
         sys.exit(1)
     elif (((datetime.now()
             - parameters['lastTimeOfFile']).days) > parameters['time']):

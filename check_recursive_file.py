@@ -77,14 +77,15 @@ if __name__ == '__main__':
 
             parameters['allCounter'] += 1
 
-            if filter(lambda str: parameters['name'] == str, dirName[2]):
-
+            if filter(lambda str: parameters['name'] in str, dirName[2]):
+                name = filter(
+                    lambda str: parameters['name'] in str, dirName[2])
                 file = {
                     'pathToFile': dirName[0],
                     'filesInPath': dirName[2],
                     'timeOfFile': datetime.fromtimestamp(
-                         getmtime(dirName[0] + "/" + parameters['name'])),
-                    'sizeOfFile': getsize(dirName[0]+"/"+parameters['name']),
+                        getmtime(dirName[0] + "/" + "".join(name))),
+                    'sizeOfFile': getsize(dirName[0] + "/" + "".join(name)),
                 }
                 parameters['counter'] += 1
                 listOfDirs.append(file)
@@ -103,20 +104,20 @@ if __name__ == '__main__':
 
     if (parameters['allContent'] == 'True') and not \
        (parameters['allCounter'] == parameters['counter']):
-        print 'WARNING !!! In '+"and".join(listWithout)+" file is not exist"
+        print 'WARNING !!! In '+" and ".join(listWithout)+" file is not exist"
         sys.exit(1)
     elif (((datetime.now()
-          - parameters['lastTimeOfFile']).days) > parameters['time']):
-                print "ALERT ! The last file %s was written %i day(s) ago." % \
-                 ("".join(parameters['name']),
-                  (datetime.now() - parameters['lastTimeOfFile']).days)
-                sys.exit(2)
+            - parameters['lastTimeOfFile']).days) > parameters['time']):
+        print "ALERT ! The last file %s was written %i day(s) ago." % \
+            ("".join(parameters['name']),
+             (datetime.now() - parameters['lastTimeOfFile']).days)
+        sys.exit(2)
     elif (parameters['sizeCounter'] < parameters['size']):
         print "WARNING ! The size of file is less then %s" % \
-           parameters['sizeStr']
+            parameters['sizeStr']
         sys.exit(1)
     else:
         print "OK. The last file %s was written %i day(s) ago." % \
-         ("".join(parameters['name']),
-          (datetime.now() - parameters['lastTimeOfFile']).days)
+            ("".join(parameters['name']),
+             (datetime.now() - parameters['lastTimeOfFile']).days)
         sys.exit(0)

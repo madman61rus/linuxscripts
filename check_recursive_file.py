@@ -28,11 +28,12 @@ def createParser():
     return (parser)
 
 
-def setParameters(allContent, size, time, name, where):
+def setParameters(allContent, size, sizeStr, time, name, where):
 
     return {
         'allContent': allContent,
         'size': int(size),
+        'sizeStr': sizeStr,
         'time': int(time),
         'name': "".join(name),
         'where': "".join(where),
@@ -51,8 +52,16 @@ if __name__ == '__main__':
     parser = createParser()
     namespace = parser.parse_args(sys.argv[1:])
 
+    if (namespace.size[-1:]) == 'M' or (namespace.size[-1:]) == 'm':
+        size = int(namespace.size[:-1]) * 1024
+    elif (namespace.size[-1:]) == 'G' or (namespace.size[-1:]) == 'g':
+        size = int(namespace.size[:-1]) * 1024 * 1024
+    else:
+        size = namespace.size
+
     parameters = setParameters(
         namespace.allContent,
+        size,
         namespace.size,
         namespace.time,
         namespace.name,
@@ -85,7 +94,7 @@ if __name__ == '__main__':
         else:
 
             listWithout.append(dirName[0])
-    
+
     if (parameters['allContent'] == 'True') and not \
        (parameters['allCounter'] == parameters['counter']):
         print 'WARNING !!! In '+"and".join(listWithout)+" file is not exist"
@@ -98,11 +107,11 @@ if __name__ == '__main__':
              (datetime.now() - parameters['lastTimeOfFile']).days)
         sys.exit(2)
     elif (parameters['sizeCounter'] < parameters['size']):
-        print "WARNING ! The size of file is %i" % parameters['sizeCounter']
+        print "WARNING ! The size of file is less then %s" % \
+           parameters['sizeStr']
         sys.exit(1)
     else:
         print "OK. The last file %s was written %i day(s) ago." % \
          ("".join(parameters['name']),
           (datetime.now() - parameters['lastTimeOfFile']).days)
         sys.exit(0)
-

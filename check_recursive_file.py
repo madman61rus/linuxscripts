@@ -80,20 +80,23 @@ if __name__ == '__main__':
             if filter(lambda str: parameters['name'] in str, dirName[2]):
                 name = filter(
                     lambda str: parameters['name'] in str, dirName[2])
-                file = {
-                    'pathToFile': dirName[0],
-                    'filesInPath': dirName[2],
-                    'timeOfFile': datetime.fromtimestamp(
-                        getmtime(dirName[0] + "/" + "".join(name))),
-                    'sizeOfFile': getsize(dirName[0] + "/" + "".join(name)),
-                }
-                parameters['counter'] += 1
-                listOfDirs.append(file)
 
-                if parameters['lastTimeOfFile'] < file['timeOfFile']:
-                    parameters['lastTimeOfFile'] = file['timeOfFile']
-                if parameters['sizeCounter'] < file['sizeOfFile']:
-                    parameters['sizeCounter'] = file['sizeOfFile']
+                for nm in name:
+
+                    file = {
+                        'pathToFile': dirName[0],
+                        'filesInPath': dirName[2],
+                        'timeOfFile': datetime.fromtimestamp(
+                            getmtime(dirName[0] + "/" + nm)),
+                        'sizeOfFile': getsize(dirName[0] + "/" + nm),
+                    }
+                    parameters['counter'] += 1
+                    listOfDirs.append(file)
+
+                    if parameters['lastTimeOfFile'] < file['timeOfFile']:
+                        parameters['lastTimeOfFile'] = file['timeOfFile']
+                    if parameters['sizeCounter'] < file['sizeOfFile']:
+                        parameters['sizeCounter'] = file['sizeOfFile']
             else:
 
                 listWithout.append(dirName[0])
@@ -102,8 +105,8 @@ if __name__ == '__main__':
         print "ALERT ! The file %s not found" % parameters['name']
         sys.exit(2)
 
-    if (parameters['allContent'] == 'True') and not \
-       (parameters['allCounter'] == parameters['counter']):
+    if (parameters['allContent'] == 'True') and \
+            (len(listWithout) > 0):
         print 'WARNING !!! In '+" and ".join(listWithout)+" file is not exist"
         sys.exit(1)
     elif (((datetime.now()
